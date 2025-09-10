@@ -16,6 +16,17 @@ app.use(cors({
 }));
 
 // initialize socket.io server
+
+// Middleware setup
+app.use(express.json({limit:"20mb"}));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+// app.use(cors());
+
+//routes setup
+app.use("/api/status",(req,res)=>res.send("Server is live"))
+app.use("/api/auth",userRouter)
+app.use("/api/messages",messageRouter)
+
 export const io = new Server(server, {
     cors: {
         origin: "https://chat-app-theta-amber-13.vercel.app",
@@ -44,15 +55,7 @@ io.on("connection",(socket)=>{
     })
 })
 
-// Middleware setup
-app.use(express.json({limit:"20mb"}));
-app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-// app.use(cors());
 
-//routes setup
-app.use("/api/status",(req,res)=>res.send("Server is live"))
-app.use("/api/auth",userRouter)
-app.use("/api/messages",messageRouter)
 
 //connect to mongodb
 await connectDB();
