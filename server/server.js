@@ -10,11 +10,19 @@ import { Server } from "socket.io";
 // create express app and http server
 const app=express();
 const server = http.createServer(app)
+app.use(cors({
+    origin: "https://chat-app-theta-amber-13.vercel.app", // your frontend
+    credentials: true
+}));
 
 // initialize socket.io server
-export const io=new Server(server,{
-    cors:{origin:"*"}
-})
+export const io = new Server(server, {
+    cors: {
+        origin: "https://chat-app-theta-amber-13.vercel.app",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
 
 //store online users
 export const userSocketMap={}//{userId:socketId}
@@ -39,7 +47,7 @@ io.on("connection",(socket)=>{
 // Middleware setup
 app.use(express.json({limit:"20mb"}));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-app.use(cors());
+// app.use(cors());
 
 //routes setup
 app.use("/api/status",(req,res)=>res.send("Server is live"))
