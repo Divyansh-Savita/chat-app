@@ -11,7 +11,7 @@ import { Server } from "socket.io";
 const app=express();
 const server = http.createServer(app)
 app.use(cors({
-    origin: "https://chat-app-theta-amber-13.vercel.app/login", // your frontend
+    origin: "https://chat-app-theta-amber-13.vercel.app", // your frontend
     credentials: true
 }));
 
