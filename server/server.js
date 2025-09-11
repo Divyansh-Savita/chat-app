@@ -29,7 +29,7 @@ app.use("/api/messages",messageRouter)
 
 export const io = new Server(server, {
     cors: {
-        origin: "*",
+        origin: "https://chat-app-theta-amber-13.vercel.app",
         methods: ["GET", "POST"],
         credentials: true
     }
