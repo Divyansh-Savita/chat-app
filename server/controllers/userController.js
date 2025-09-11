@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs"
 
 // Signup a new user
 export const signup= async (req,res)=>{
+  res.setHeader("Access-Control-Allow-Origin", "*");
     const {fullName,email,password,bio}=req.body
     try{
         if(!fullName || !email || !password || !bio){

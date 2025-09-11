@@ -23,8 +23,8 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 // app.use(cors());
 
 //routes setup
-app.use("/api/status",(req,res)=>res.send("Server is live"))
-app.use("/api/auth",userRouter)
+app.use("/api/status",(req,res)=>{res.setHeader("Access-Control-Allow-Origin", "*"); res.send("Server is live")})
+app.use("/api/auth",userRouter )
 app.use("/api/messages",messageRouter)
 
 export const io = new Server(server, {
