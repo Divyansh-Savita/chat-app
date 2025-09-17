@@ -50,15 +50,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Handle preflight requests explicitly
-app.options('*', (req, res) => {
-    console.log('OPTIONS preflight request received');
-    res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://chat-app-theta-amber-13.vercel.app');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.sendStatus(200);
-});
+// CORS middleware handles preflight requests automatically
 
 // Middleware setup
 app.use(express.json({limit:"20mb"}));
@@ -112,7 +104,13 @@ io.on("connection",(socket)=>{
 
 
 //connect to mongodb
-await connectDB();
+try {
+    await connectDB();
+} catch (error) {
+    console.log("Database connection failed:", error.message);
+    console.log("Server will continue without database connection for testing");
+}
+
 if(process.env.NODE_ENV !=="production"){
 const PORT= process.env.PORT || 5000;
 server.listen(PORT,()=>console.log("Server is running on PORT:"+PORT))}
