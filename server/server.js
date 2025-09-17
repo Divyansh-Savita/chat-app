@@ -12,6 +12,7 @@ const app=express();
 const server = http.createServer(app)
 app.use(cors({
     origin: "https://chat-app-theta-amber-13.vercel.app", // your frontend
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true
 }));
 
