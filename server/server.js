@@ -10,21 +10,29 @@ import { Server } from "socket.io";
 // create express app and http server
 const app=express();
 const server = http.createServer(app)
+// CORS configuration
 app.use(cors({
     origin: "https://chat-app-theta-amber-13.vercel.app", // your frontend
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
     credentials: true
 }));
 
-// initialize socket.io server
+// Handle preflight requests
+app.options('*', (req, res) => {
+    res.header('Access-Control-Allow-Origin', 'https://chat-app-theta-amber-13.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.sendStatus(200);
+});
 
 // Middleware setup
 app.use(express.json({limit:"20mb"}));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
-// app.use(cors());
 
 //routes setup
-app.use("/api/status",(req,res)=>{res.setHeader("Access-Control-Allow-Origin", "*"); res.send("Server is live")})
+app.use("/api/status",(req,res)=>{res.send("Server is live")})
 app.use("/api/auth",userRouter )
 app.use("/api/messages",messageRouter)
 
