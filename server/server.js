@@ -12,17 +12,50 @@ const app=express();
 const server = http.createServer(app)
 // CORS configuration
 app.use(cors({
-    origin: "https://chat-app-theta-amber-13.vercel.app", // your frontend
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'https://chat-app-theta-amber-13.vercel.app',
+            'http://localhost:3000', // for local development
+            'http://localhost:5173'  // for Vite dev server
+        ];
+        
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        } else {
+            console.log('CORS blocked origin:', origin);
+            return callback(new Error('Not allowed by CORS'));
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    credentials: true
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers choke on 204
 }));
 
-// Handle preflight requests
-app.options('*', (req, res) => {
-    res.header('Access-Control-Allow-Origin', 'https://chat-app-theta-amber-13.vercel.app');
+// Additional CORS middleware for debugging
+app.use((req, res, next) => {
+    console.log('Request origin:', req.headers.origin);
+    console.log('Request method:', req.method);
+    console.log('Request path:', req.path);
+    
+    // Set CORS headers manually as backup
+    res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://chat-app-theta-amber-13.vercel.app');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    
+    next();
+});
+
+// Handle preflight requests explicitly
+app.options('*', (req, res) => {
+    console.log('OPTIONS preflight request received');
+    res.header('Access-Control-Allow-Origin', req.headers.origin || 'https://chat-app-theta-amber-13.vercel.app');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
     res.header('Access-Control-Allow-Credentials', 'true');
     res.sendStatus(200);
 });
@@ -33,6 +66,18 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 //routes setup
 app.use("/api/status",(req,res)=>{res.send("Server is live")})
+
+// CORS test endpoint
+app.get("/api/cors-test", (req, res) => {
+    console.log('CORS test endpoint hit');
+    res.json({ 
+        success: true, 
+        message: "CORS is working!",
+        origin: req.headers.origin,
+        timestamp: new Date().toISOString()
+    });
+});
+
 app.use("/api/auth",userRouter )
 app.use("/api/messages",messageRouter)
 
